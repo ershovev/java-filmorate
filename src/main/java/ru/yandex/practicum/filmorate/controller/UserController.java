@@ -20,7 +20,7 @@ public class UserController {
 
     @GetMapping
     public List<User> findAll() {
-        return new ArrayList<User>(users.values());
+        return new ArrayList<>(users.values());
     }
 
     @PostMapping
@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User createOrUpdate(@Valid @RequestBody User user) throws NoSuchUserException {
+    public User update(@Valid @RequestBody User user) throws NoSuchUserException {
         if (user.getId() != null && users.containsKey(user.getId())) {
             if (user.getName() == null) {
                 user.setName(user.getLogin());

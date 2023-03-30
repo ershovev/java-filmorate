@@ -23,7 +23,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> findAll() {
-        return new ArrayList<Film>(films.values());
+        return new ArrayList<>(films.values());
     }
 
     @PostMapping
@@ -40,7 +40,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film createOrUpdate(@Valid @RequestBody Film film) throws NoSuchFilmException {
+    public Film update(@Valid @RequestBody Film film) throws NoSuchFilmException {
         if (film.getId() != null && films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.debug("Обновлен фильм: {}", film.toString());
