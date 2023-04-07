@@ -18,8 +18,8 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
-    private Integer filmIdCounter = 1;
-    private static final LocalDate BIRTHDAY_OF_CINEMA = LocalDate.of(1895, 12, 28);
+    private Integer id = 1;
+    private static final LocalDate EARLIEST_POSSIBLE_DATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public List<Film> findAll() {
@@ -27,20 +27,20 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(BIRTHDAY_OF_CINEMA)) {
-            log.debug("Ошибка добавления фильма: Дата выхода фильма раньше дня рождения кино");
-            throw new ValidationException("Дата выхода фильма раньше дня рождения кино");
+    public Film create(@Valid @RequestBody Film film) {
+        if (film.getReleaseDate().isBefore(EARLIEST_POSSIBLE_DATE)) {
+            log.debug("Ошибка добавления фильма: Дата выхода фильма раньше дня рождения кино - самой ранней возможной даты");
+            throw new ValidationException("Дата выхода фильма раньше дня рождения кино - самой ранней возможной даты");
         }
-        film.setId(filmIdCounter);
-        films.put(filmIdCounter, film);
-        filmIdCounter++;
+        film.setId(id);
+        films.put(id, film);
+        id++;
         log.debug("Добавлен фильм: {}", film.toString());
         return film;
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film) throws NoSuchFilmException {
+    public Film update(@Valid @RequestBody Film film) {
         if (film.getId() != null && films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.debug("Обновлен фильм: {}", film.toString());

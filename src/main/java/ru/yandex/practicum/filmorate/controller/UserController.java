@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) throws NoSuchUserException {
+    public User update(@Valid @RequestBody User user) {
         if (user.getId() != null && users.containsKey(user.getId())) {
             if (user.getName() == null) {
                 user.setName(user.getLogin());
