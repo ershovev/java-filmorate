@@ -19,7 +19,7 @@ import java.util.Map;
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
     private Integer id = 1;
-    private static final LocalDate EARLIEST_POSSIBLE_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate EARLIEST_POSSIBLE_FILM_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public List<Film> findAll() {
@@ -28,7 +28,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate().isBefore(EARLIEST_POSSIBLE_DATE)) {
+        if (film.getReleaseDate().isBefore(EARLIEST_POSSIBLE_FILM_RELEASE_DATE)) {
             log.debug("Ошибка добавления фильма: Дата выхода фильма раньше дня рождения кино - самой ранней возможной даты");
             throw new ValidationException("Дата выхода фильма раньше дня рождения кино - самой ранней возможной даты");
         }

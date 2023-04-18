@@ -33,7 +33,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void idShouldBe1() throws ValidationException {
+    void idShouldBe1() {
         filmController.create(film);
         assertEquals(1, film.getId());
     }
