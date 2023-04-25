@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -15,11 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class UserControllerTest {
+    UserStorage userStorage;
+    UserService userService;
     UserController userController;
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController();
+        userStorage = new InMemoryUserStorage();
+        userService = new UserService((InMemoryUserStorage) userStorage);
+        userController = new UserController(userService);
     }
 
     @Test
@@ -63,7 +70,7 @@ public class UserControllerTest {
 
         final NoSuchUserException exception = assertThrows(NoSuchUserException.class, new Executable() {
             @Override
-            public void execute() throws Throwable {
+            public void execute() {
                 userController.update(updatedUser);
             }
         });

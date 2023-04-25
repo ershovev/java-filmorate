@@ -7,20 +7,27 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
 public class Film {
-
     private Integer id;
     private LocalDate releaseDate;
-
     @NotBlank
     private final String name;
-
     @Size(min = 0, max = 200)
     private final String description;
-
     @Positive
     private final int duration;
+    private final Set<Integer> likedUsersIds = new HashSet<>();
+
+    public void addLike(Integer userId) {  // добавление айди пользователя, которому понравился фильм
+        likedUsersIds.add(userId);
+    }
+
+    public void removeLike(Integer userId) { // удаление айди пользователя, который отозвал свой лайк
+        likedUsersIds.remove(userId);
+    }
 }
