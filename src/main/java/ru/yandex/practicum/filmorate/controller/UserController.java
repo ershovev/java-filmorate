@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -12,13 +11,9 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/users")
     public List<User> findAll() {    // получить всех пользователей
@@ -42,22 +37,12 @@ public class UserController {
 
     @PostMapping("/users")
     public User create(@Valid @RequestBody User user) {   // создать пользователя
-        User createdUser = userService.create(user);
-        log.debug("Добавлен пользователь: {}", createdUser.toString());
-        return createdUser;
+        return userService.create(user);
     }
 
     @PutMapping("/users")
     public User update(@Valid @RequestBody User user) {  // обновить пользователя
-        if (userService.isUserPresent(user)) {
-            userService.update(user);
-            log.debug("Обновлен пользователь: {}", user.toString());
-        } else {
-            log.debug("Ошибка обновления пользователя: Пользователь {} не найден", user.toString());
-            throw new NoSuchUserException("Пользователь не найден");
-        }
-
-        return user;
+        return userService.update(user);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")     // добавить пользователей в друзья друг другу

@@ -35,20 +35,12 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public boolean isFilmPresent(Film film) {
-        if (film.getId() != null && films.containsKey(film.getId())) {
-            return true;
-        } else {
-            return false;
-        }
+        return film.getId() != null && films.containsKey(film.getId());
     }
 
     @Override
     public boolean isFilmPresentById(Integer id) {
-        if (films.containsKey(id)) {
-            return true;
-        } else {
-            return false;
-        }
+        return films.containsKey(id);
     }
 
     @Override

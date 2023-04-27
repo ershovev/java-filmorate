@@ -41,20 +41,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public boolean isUserPresent(User user) {
-        if (user.getId() != null && users.containsKey(user.getId())) {
-            return true;
-        } else {
-            return false;
-        }
+        return user.getId() != null && users.containsKey(user.getId());
     }
 
     @Override
     public boolean isUserPresentById(Integer id) {
-        if (users.containsKey(id)) {
-            return true;
-        } else {
-            return false;
-        }
+        return users.containsKey(id);
     }
 
     @Override

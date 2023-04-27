@@ -1,24 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class FilmService {
+    private static final LocalDate EARLIEST_POSSIBLE_FILM_RELEASE_DATE = LocalDate.of(1895, 12, 28);
     FilmStorage filmStorage;
-
-    @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -32,11 +32,24 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        return filmStorage.create(film);
+        if (film.getReleaseDate().isBefore(EARLIEST_POSSIBLE_FILM_RELEASE_DATE)) {
+            log.debug("Ошибка добавления фильма: Дата выхода фильма раньше дня рождения кино - самой ранней возможной даты");
+            throw new ValidationException("Дата выхода фильма раньше дня рождения кино - самой ранней возможной даты");
+        }
+        Film addedFilm = filmStorage.create(film);
+        log.debug("Добавлен фильм: {}", addedFilm.toString());
+        return addedFilm;
     }
 
     public Film update(Film film) {
-        return filmStorage.update(film);
+        if (isFilmPresent(film)) {
+            filmStorage.update(film);
+            log.debug("Обновлен фильм: {}", film.toString());
+        } else {
+            log.debug("Ошибка обновления фильма: Фильм {} не найден", film.toString());
+            throw new NoSuchFilmException("Фильм не найден");
+        }
+        return film;
     }
 
     public boolean isFilmPresent(Film film) {

@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
@@ -15,13 +14,9 @@ import java.util.Set;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserService {
     UserStorage userStorage;
-
-    @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -35,11 +30,20 @@ public class UserService {
     }
 
     public User create(User user) {
-        return userStorage.create(user);
+        User createdUser = userStorage.create(user);
+        log.debug("Добавлен пользователь: {}", createdUser.toString());
+        return createdUser;
     }
 
     public User update(User user) {
-        return userStorage.update(user);
+        if (isUserPresent(user)) {
+            userStorage.update(user);
+            log.debug("Обновлен пользователь: {}", user.toString());
+        } else {
+            log.debug("Ошибка обновления пользователя: Пользователь {} не найден", user.toString());
+            throw new NoSuchUserException("Пользователь не найден");
+        }
+        return user;
     }
 
     public boolean isUserPresent(User user) {
