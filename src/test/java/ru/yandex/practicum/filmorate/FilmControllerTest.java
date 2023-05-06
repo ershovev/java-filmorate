@@ -8,6 +8,9 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -17,12 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 public class FilmControllerTest {
 
+    FilmStorage filmStorage;
+    FilmService filmService;
     FilmController filmController;
     Film film;
 
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmController();
+        filmStorage = new InMemoryFilmStorage();
+        filmService = new FilmService((InMemoryFilmStorage) filmStorage);
+        filmController = new FilmController(filmService);
 
         film = Film.builder()
                 .name("TestFilm")
