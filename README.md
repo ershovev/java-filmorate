@@ -42,11 +42,9 @@ AND id IN (SELECT requester_id
 3) Get most popular films
 ```
 SELECT id, release_date, name, description, mpa_rating_id, duration
-FROM movies AS mov
-JOIN (SELECT movie_id, count(movie_id) AS likes_count
-                   FROM likedMovies
-                   GROUP BY movie_id
-                   ORDER BY likes_count DESC
-                   LIMIT :limit) AS toplikes ON mov.id = toplikes.movie_id
-ORDER BY toplikes.likes_count DESC;
+FROM movies AS m
+RIGHT JOIN likedMovies AS lm ON m.id = lm.movie_id
+GROUP BY m.id
+ORDER BY COUNT(lm.user_id) DESC
+LIMIT :limit;
 ```
