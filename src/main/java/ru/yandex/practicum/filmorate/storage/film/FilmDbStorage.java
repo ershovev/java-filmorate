@@ -47,13 +47,13 @@ public class FilmDbStorage implements FilmStorage {
         deleteFilmAndGenreIdFromDb(film); // вызываем метод для удаления записей в таблице БД genre_movie
         String sqlQuery = "UPDATE movies SET release_date = ?, name = ?, description = ?," +
                 " mpa_rating_id = ?, duration = ? WHERE id = ?";
-        jdbcTemplate.update(sqlQuery
-                , film.getReleaseDate()
-                , film.getName()
-                , film.getDescription()
-                , film.getMpa().getId()
-                , film.getDuration()
-                , film.getId());
+        jdbcTemplate.update(sqlQuery,
+                film.getReleaseDate(),
+                film.getName(),
+                film.getDescription(),
+                film.getMpa().getId(),
+                film.getDuration(),
+                film.getId());
 
         if (!(film.getGenres() == null)) {
             insertFilmAndGenreIdIntoDb(film); // вызываем метод для создания записей в таблице БД genre_movie
@@ -107,18 +107,14 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "MERGE INTO likedmovies (user_who_liked_id, movie_id)" +
                 " KEY (user_who_liked_id, movie_id) VALUES (?, ?);";
 
-        jdbcTemplate.update(sqlQuery
-                , userId
-                , filmId);
+        jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
     @Override
     public void removeLike(Integer filmId, Integer userId) {
         String sqlQuery = "DELETE FROM likedmovies WHERE movie_id = ? AND user_who_liked_id = ?;";
 
-        jdbcTemplate.update(sqlQuery
-                , filmId
-                , userId);
+        jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     @Override
@@ -188,7 +184,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private void deleteFilmAndGenreIdFromDb(Film film) {
         String sqlQuery = "DELETE FROM genre_movie WHERE movie_id = ?;";
-        jdbcTemplate.update(sqlQuery
-                , film.getId());
+        jdbcTemplate.update(sqlQuery, film.getId());
     }
 }

@@ -43,12 +43,12 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ?" +
                 " WHERE id = ?";
 
-        jdbcTemplate.update(sqlQuery
-                , user.getEmail()
-                , user.getLogin()
-                , user.getName()
-                , user.getBirthday()
-                , user.getId());
+        jdbcTemplate.update(sqlQuery,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday(),
+                user.getId());
 
         return getUser(user.getId());
     }
@@ -86,17 +86,11 @@ public class UserDbStorage implements UserStorage {
         if (exists) {   // если запись существует то подтверждаем ранее поданную заявку от второго пользователя
             String sqlQueryForUpdate = "UPDATE friendship SET friendship_status = ? " +
                     "WHERE requester_id = ? AND requestee_id = ?;";
-            jdbcTemplate.update(sqlQueryForUpdate
-                    , "Confirmed"
-                    , requestee_id
-                    , requester_id);
+            jdbcTemplate.update(sqlQueryForUpdate, "Confirmed", requestee_id, requester_id);
         } else {  // если записи не существует то создаем со статусом Not confirmed
             String sqlQueryForCreate = "INSERT INTO friendship(requester_id, requestee_id, friendship_status) " +
                     "values (?, ?, ?)";
-            jdbcTemplate.update(sqlQueryForCreate
-                    , requester_id
-                    , requestee_id
-                    , "Not confirmed");
+            jdbcTemplate.update(sqlQueryForCreate, requester_id, requestee_id, "Not confirmed");
         }
     }
 
