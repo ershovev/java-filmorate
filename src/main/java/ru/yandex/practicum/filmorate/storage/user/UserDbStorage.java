@@ -76,21 +76,21 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(Integer requester_id, Integer requestee_id) {
+    public void addFriend(Integer requesterId, Integer requesteeId) {
         String sqlQuery = "SELECT requester_id " +   //
                 "FROM friendship WHERE requester_id = ? AND requestee_id = ? AND FRIENDSHIP_STATUS = 'Not confirmed';";
 
-        boolean exists = jdbcTemplate.query(sqlQuery, new Object[]{requestee_id, requester_id}, (ResultSet rs) -> {
+        boolean exists = jdbcTemplate.query(sqlQuery, new Object[]{requesteeId, requesterId}, (ResultSet rs) -> {
             return rs.next();
         }); // проверяем есть ли запись о неподтвержденной дружбе
         if (exists) {   // если запись существует то подтверждаем ранее поданную заявку от второго пользователя
             String sqlQueryForUpdate = "UPDATE friendship SET friendship_status = ? " +
                     "WHERE requester_id = ? AND requestee_id = ?;";
-            jdbcTemplate.update(sqlQueryForUpdate, "Confirmed", requestee_id, requester_id);
+            jdbcTemplate.update(sqlQueryForUpdate, "Confirmed", requesteeId, requesterId);
         } else {  // если записи не существует то создаем со статусом Not confirmed
             String sqlQueryForCreate = "INSERT INTO friendship(requester_id, requestee_id, friendship_status) " +
                     "values (?, ?, ?)";
-            jdbcTemplate.update(sqlQueryForCreate, requester_id, requestee_id, "Not confirmed");
+            jdbcTemplate.update(sqlQueryForCreate, requesterId, requesteeId, "Not confirmed");
         }
     }
 

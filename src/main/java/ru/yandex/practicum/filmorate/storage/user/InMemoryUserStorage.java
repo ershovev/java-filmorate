@@ -52,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(Integer requester_id, Integer requestee_id) {
+    public void addFriend(Integer requesterId, Integer requesteeId) {
     }
 
     @Override
