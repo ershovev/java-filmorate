@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -22,6 +23,12 @@ class FilmoRateApplicationTests {
 
     @Test
     public void testFindUserById() {
+        User user1 = userStorage.create(User.builder()
+                .email("test@mail.com")
+                .login("superuser")
+                .name("testName")
+                .birthday(LocalDate.of(1962, 11, 11))
+                .build());
 
         Optional<User> userOptional = Optional.ofNullable(userStorage.getUser(1));
 
