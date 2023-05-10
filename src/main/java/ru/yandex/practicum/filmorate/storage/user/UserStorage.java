@@ -16,4 +16,12 @@ public interface UserStorage {
     boolean isUserPresentById(Integer id);
 
     User getUser(Integer id); // получить пользователя
+
+    void addFriend(Integer userId, Integer friendId);
+
+    void deleteFriendshipFromEachOther(Integer userId, Integer otherUserId);
+
+    List<User> getAllFriends(Integer id);
+
+    List<User> getCommonFriends(Integer userId, Integer otherUserId);
 }

@@ -13,11 +13,11 @@ SELECT *
 FROM users
 WHERE id IN (SELECT requester_id
              FROM friendship
-             WHERE requestee_id IS :user_id
+             WHERE requestee_id = :user_id
              UNION
              SELECT requestee_id
              FROM friendship
-             WHERE requester_id IS :user_id AND status = 'Confirmed');
+             WHERE requester_id = :user_id AND friendship_status = 'Confirmed');
 ```
 
 2) Get common friends
@@ -26,18 +26,18 @@ SELECT *
 FROM users
 WHERE id IN (SELECT requester_id
              FROM friendship
-             WHERE requestee_id IS :user_id
+             WHERE requestee_id = :user_id
              UNION
              SELECT requestee_id
              FROM friendship
-             WHERE requester_id IS :user_id AND status = 'Confirmed')
+             WHERE requester_id = :user_id AND friendship_status = 'Confirmed')
 AND id IN (SELECT requester_id
              FROM friendship
-             WHERE requestee_id IS :another_user_id
+             WHERE requestee_id = :another_user_id
              UNION
              SELECT requestee_id
              FROM friendship
-             WHERE requester_id IS :another_user_id AND status = 'Confirmed');
+             WHERE requester_id = :another_user_id AND friendship_status = 'Confirmed');
 ```
 3) Get most popular films
 ```

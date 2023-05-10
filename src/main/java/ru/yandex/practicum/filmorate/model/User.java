@@ -5,8 +5,8 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
@@ -19,13 +19,13 @@ public class User {
     private String name;
     @PastOrPresent
     private final LocalDate birthday;
-    private final Set<Integer> friends = new HashSet<>();
 
-    public void addFriend(Integer id) {  // добавление айди друга
-        friends.add(id);
-    }
-
-    public void deleteFriend(Integer id) {  // удаление айди друга
-        friends.remove(id);
+    public Map<String, Object> toMap() {  // метод создания хэшмапы с данными пользователя
+        Map<String, Object> values = new HashMap<>();  // для использования в simpleJdbcInsert
+        values.put("email", email);
+        values.put("login", login);
+        values.put("name", name);
+        values.put("birthday", birthday);
+        return values;
     }
 }

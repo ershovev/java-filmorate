@@ -25,7 +25,7 @@ public class UserControllerTest {
     @BeforeEach
     void beforeEach() {
         userStorage = new InMemoryUserStorage();
-        userService = new UserService((InMemoryUserStorage) userStorage);
+        userService = new UserService(userStorage);
         userController = new UserController(userService);
     }
 
@@ -78,3 +78,4 @@ public class UserControllerTest {
         assertEquals("Пользователь не найден", exception.getMessage());
     }
 }
+

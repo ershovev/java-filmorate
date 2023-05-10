@@ -51,4 +51,4 @@ WHERE NOT EXISTS (SELECT id FROM GENRES
 INSERT INTO GENRES (id, name)
 SELECT * FROM (SELECT 6 AS id, 'Боевик' AS name) AS temp
 WHERE NOT EXISTS (SELECT id FROM GENRES
-                  WHERE id = 6);	
+                  WHERE id = 6);
