@@ -46,11 +46,9 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {  //преобразовать строку в объект Mpa
-        Mpa mpa = Mpa.builder()
+        return Mpa.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
                 .build();
-
-        return mpa;
     }
 }

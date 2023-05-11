@@ -3,17 +3,21 @@ package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Primary
@@ -33,10 +37,10 @@ public class FilmDbStorage implements FilmStorage {
         Integer filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue(); // сохраняем фильм в БД и получаем id фильма
         film.setId(filmId);
 
-        if (!(film.getGenres() == null)) {
+        if (film.getGenres() != null) {
             insertFilmAndGenreIdIntoDb(film); // вызываем метод для создания записей в таблице БД genre_movie
         } else {
-            film.setGenres(new ArrayList<>(10));
+            film.setGenres(new ArrayList<>());
         }
 
         return getFilm(filmId);
@@ -55,10 +59,10 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getId());
 
-        if (!(film.getGenres() == null)) {
+        if (film.getGenres() != null) {
             insertFilmAndGenreIdIntoDb(film); // вызываем метод для создания записей в таблице БД genre_movie
         } else {
-            film.setGenres(new ArrayList<>(10));
+            film.setGenres(new ArrayList<>());
         }
         return getFilm(film.getId());
     }
@@ -150,10 +154,10 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(resultSet.getInt("duration"))
                 .build();
 
-        if (!(film.getGenres() == null)) {
+        if (film.getGenres() != null) {
             insertFilmAndGenreIdIntoDb(film); // вызываем метод для создания записей в таблице БД genre_movie
         } else {
-            film.setGenres(new ArrayList<>(10));
+            film.setGenres(new ArrayList<>());
         }
 
         return film;
@@ -175,11 +179,24 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void insertFilmAndGenreIdIntoDb(Film film) {
-        for (Genre genre : film.getGenres()) {    // проходим по жанрам и создаем запись в таблице genre_movie
-            String sqlQuery = "MERGE INTO GENRE_MOVIE (movie_id, genre_id) KEY (movie_id, genre_id) VALUES (?, ?);";
+        String sqlQuery;
+        List<Integer> filmIdGenreId = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
 
-            jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
+        for (Genre genre : film.getGenres()) {    // проходим по жанрам и добавляем запросы в stringbuilder и id фильмов и жанров в arraylist
+            stringBuilder.append("MERGE INTO GENRE_MOVIE (movie_id, genre_id) KEY (movie_id, genre_id) VALUES (?, ?); ");
+            filmIdGenreId.add(film.getId());
+            filmIdGenreId.add(genre.getId());
         }
+        sqlQuery = stringBuilder.toString();
+            jdbcTemplate.update(sqlQuery, new PreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps) throws SQLException {
+                    for (int i = 1; i <= filmIdGenreId.size(); i++) {  // добавляем id фильмов и жанров в запрос
+                        ps.setInt(i, filmIdGenreId.get(i - 1));
+                    }
+                }
+            });
     }
 
     private void deleteFilmAndGenreIdFromDb(Film film) {

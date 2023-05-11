@@ -144,14 +144,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException { // метод создания объекта User из ответа БД
-        User user = User.builder()
+        return User.builder()
                 .id(resultSet.getInt("id"))
                 .email(resultSet.getString("email"))
                 .login(resultSet.getString("login"))
                 .name(resultSet.getString("name"))
                 .birthday(LocalDate.parse(resultSet.getString("birthday")))
                 .build();
-
-        return user;
     }
 }

@@ -45,11 +45,9 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {  //преобразовать строку в объект Genre
-        Genre genre = Genre.builder()
+        return Genre.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
                 .build();
-
-        return genre;
     }
 }
