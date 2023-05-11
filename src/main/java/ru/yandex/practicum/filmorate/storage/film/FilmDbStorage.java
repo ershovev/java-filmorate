@@ -15,9 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @Primary
@@ -189,14 +187,14 @@ public class FilmDbStorage implements FilmStorage {
             filmIdGenreId.add(genre.getId());
         }
         sqlQuery = stringBuilder.toString();
-            jdbcTemplate.update(sqlQuery, new PreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps) throws SQLException {
-                    for (int i = 1; i <= filmIdGenreId.size(); i++) {  // добавляем id фильмов и жанров в запрос
-                        ps.setInt(i, filmIdGenreId.get(i - 1));
-                    }
+        jdbcTemplate.update(sqlQuery, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                for (int i = 1; i <= filmIdGenreId.size(); i++) {  // добавляем id фильмов и жанров в запрос
+                    ps.setInt(i, filmIdGenreId.get(i - 1));
                 }
-            });
+            }
+        });
     }
 
     private void deleteFilmAndGenreIdFromDb(Film film) {
