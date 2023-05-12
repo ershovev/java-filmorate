@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -70,15 +71,17 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "SELECT * FROM movies AS film " +
                 "LEFT JOIN mpa_rating AS mpa ON film.mpa_rating_id = mpa.id;";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm); // вызываем mapRowToFilm и преобразуем строки в объекты Film
-        for (Film film : films) {
-            film.setGenres(getGenresOfFilm(film.getId())); // добавляем жанры
+
+        if (films.isEmpty()) {
+            return films;
         }
-        return films;
+        return setGenresOfFilms(films);
     }
 
     @Override
     public boolean isFilmPresent(Film film) {
         return isFilmPresentById(film.getId());
+
     }
 
     @Override
@@ -131,11 +134,11 @@ public class FilmDbStorage implements FilmStorage {
 
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, size); //отправляем запрос и получаем фильмы
 
-        for (Film film : films) {
-            film.setGenres(getGenresOfFilm(film.getId()));  // добавляем жанры
+        if (films.isEmpty()) {
+            return films;
         }
 
-        return films;
+        return setGenresOfFilms(films);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {  //преобразовать строку в объект Film
@@ -174,6 +177,45 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE movie_id = ?;";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);   //вызываем mapRowToGenre чтобы преобразовать
         //каждую строку в объект Genre
+    }
+
+    private List<Film> setGenresOfFilms(List<Film> films) {
+        String sqlQuery = "SELECT g.id, g.name, gm.movie_id FROM genre_movie AS gm " +
+                "JOIN genres AS g on gm.GENRE_ID = g.id WHERE gm.movie_id = -1 ";
+        List<Integer> filmsIds = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Film film : films) {  // проходимся по фильмам и дополняем запрос
+            stringBuilder.append("OR gm.movie_id = ? ");
+            filmsIds.add(film.getId());
+            film.setGenres(new ArrayList<>());
+        }
+
+        sqlQuery = sqlQuery + stringBuilder;
+        Object[] filmsIdsObjects = filmsIds.toArray();
+
+        SqlRowSet filmGenreRows = jdbcTemplate.queryForRowSet(sqlQuery, filmsIdsObjects);
+
+        if (!filmGenreRows.next()) {
+            return films;
+        }
+
+        while (!filmGenreRows.isAfterLast()) {
+            // проходимся по строкам, билдим жанры и добавляем к фильмам
+            Genre genre = Genre.builder()
+                    .id(Integer.valueOf(filmGenreRows.getString("id")))
+                    .name(filmGenreRows.getString("name"))
+                    .build();
+
+            for (Film film : films) {
+                if (film.getId() == Integer.valueOf(filmGenreRows.getString("movie_id"))) {
+                    film.addGenre(genre);
+                }
+            }
+            filmGenreRows.next();
+        }
+
+        return films;
     }
 
     private void insertFilmAndGenreIdIntoDb(Film film) {

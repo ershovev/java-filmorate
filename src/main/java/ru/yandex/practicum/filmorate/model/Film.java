@@ -34,4 +34,8 @@ public class Film {
         values.put("duration", duration);
         return values;
     }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
 }
