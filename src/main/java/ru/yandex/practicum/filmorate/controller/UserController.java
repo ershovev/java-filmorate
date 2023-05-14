@@ -45,7 +45,7 @@ public class UserController {
         return userService.update(user);
     }
 
-    @PutMapping("/users/{id}/friends/{friendId}")     // добавить пользователей в друзья друг другу
+    @PutMapping("/users/{id}/friends/{friendId}")     // отпрвить заявку на дружбу либо подтвердить дружбу
     public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
         userService.addFriend(id, friendId);
     }

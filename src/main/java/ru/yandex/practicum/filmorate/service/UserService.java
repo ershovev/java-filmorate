@@ -7,16 +7,14 @@ import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class UserService {
-    UserStorage userStorage;
+
+    private final UserStorage userStorage;
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -26,24 +24,30 @@ public class UserService {
         if (!isUserPresentById(id)) {
             throw new NoSuchUserException("Пользователь не найден");
         }
+
         return userStorage.getUser(id);
     }
 
     public User create(User user) {
+        if (user.getName() == null || user.getName().equals("")) {
+            user.setName(user.getLogin());
+        }
         User createdUser = userStorage.create(user);
         log.debug("Добавлен пользователь: {}", createdUser.toString());
         return createdUser;
     }
 
     public User update(User user) {
+        User userToReturn;
         if (isUserPresent(user)) {
-            userStorage.update(user);
+            userToReturn = userStorage.update(user);
             log.debug("Обновлен пользователь: {}", user.toString());
         } else {
             log.debug("Ошибка обновления пользователя: Пользователь {} не найден", user.toString());
             throw new NoSuchUserException("Пользователь не найден");
         }
-        return user;
+
+        return userToReturn;
     }
 
     public boolean isUserPresent(User user) {
@@ -52,54 +56,46 @@ public class UserService {
 
     public boolean isUserPresentById(Integer id) {
         return userStorage.isUserPresentById(id);
-        }
-
-    public void addFriend(Integer userId, Integer friendId) {
-        if (!isUserPresentById(userId)) {
-            throw new NoSuchUserException("Пользователь не найден");
-        }
-        if (!isUserPresentById(friendId)) {
-            throw new NoSuchUserException("Пользователь не найден");
-        }
-        userStorage.getUser(userId).addFriend(friendId);   // добавляем айди друга юзеру
-        userStorage.getUser(friendId).addFriend(userId);   // добавляем айди юзера другу
     }
 
-    public void deleteFriend(Integer userId, Integer friendId) {
+    public void addFriend(Integer userId, Integer otherUserId) {
         if (!isUserPresentById(userId)) {
             throw new NoSuchUserException("Пользователь не найден");
         }
-        if (!isUserPresentById(friendId)) {
+        if (!isUserPresentById(otherUserId)) {
             throw new NoSuchUserException("Пользователь не найден");
         }
-        userStorage.getUser(userId).deleteFriend(friendId);  // удаляем айди друга из юзера
-        userStorage.getUser(friendId).deleteFriend(userId);  // удаляаем айди юзера из друга
+
+        userStorage.addFriend(userId, otherUserId);
+    }
+
+    public void deleteFriend(Integer userId, Integer otherUserId) {
+        if (!isUserPresentById(userId)) {
+            throw new NoSuchUserException("Пользователь не найден");
+        }
+        if (!isUserPresentById(otherUserId)) {
+            throw new NoSuchUserException("Пользователь не найден");
+        }
+
+        userStorage.deleteFriendshipFromEachOther(userId, otherUserId);
     }
 
     public List<User> getAllFriends(Integer userId) {
-        Set<Integer> friends = userStorage.getUser(userId).getFriends(); // получение списка id всех друзей
-        List<User> usersFriends = new ArrayList<>();
-
-        for (User user : userStorage.findAll()) {
-            if (friends.contains(user.getId())) {
-                usersFriends.add(user);
-            }
+        if (!isUserPresentById(userId)) {
+            throw new NoSuchUserException("Пользователь не найден");
         }
-        return usersFriends;
+
+        return userStorage.getAllFriends(userId);
     }
 
     public List<User> getCommonFriends(Integer userId, Integer otherUserId) {
-        Set<Integer> userFriends = new HashSet<>(userStorage.getUser(userId).getFriends());
-        Set<Integer> otherUserFriends = new HashSet<>(userStorage.getUser(otherUserId).getFriends());
-        userFriends.retainAll(otherUserFriends); // фильтруем по общим друзьям
-
-        List<User> commonFriends = new ArrayList<>();
-
-        for (User user : userStorage.findAll()) {
-            if (userFriends.contains(user.getId())) {
-                commonFriends.add(user);
-            }
+        if (!isUserPresentById(userId)) {
+            throw new NoSuchUserException("Пользователь не найден");
         }
-        return commonFriends;
+        if (!isUserPresentById(otherUserId)) {
+            throw new NoSuchUserException("Пользователь не найден");
+        }
+
+        return userStorage.getCommonFriends(userId, otherUserId);
     }
 }

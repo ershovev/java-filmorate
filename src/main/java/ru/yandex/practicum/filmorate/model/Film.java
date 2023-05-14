@@ -7,13 +7,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
 public class Film {
     private Integer id;
+    private List<Genre> genres;
+    private Mpa mpa;
     private LocalDate releaseDate;
     @NotBlank
     private final String name;
@@ -21,13 +24,18 @@ public class Film {
     private final String description;
     @Positive
     private final int duration;
-    private final Set<Integer> likedUsersIds = new HashSet<>();
 
-    public void addLike(Integer userId) {  // добавление айди пользователя, которому понравился фильм
-        likedUsersIds.add(userId);
+    public Map<String, Object> toMap() {  // метод создания хэшмапы с данными фильма
+        Map<String, Object> values = new HashMap<>();  // для использования в simpleJdbcInsert
+        values.put("release_date", releaseDate);
+        values.put("mpa_rating_id", mpa.getId());
+        values.put("name", name);
+        values.put("description", description);
+        values.put("duration", duration);
+        return values;
     }
 
-    public void removeLike(Integer userId) { // удаление айди пользователя, который отозвал свой лайк
-        likedUsersIds.remove(userId);
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 }

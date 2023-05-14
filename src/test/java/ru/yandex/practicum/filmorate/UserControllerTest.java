@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
@@ -17,50 +18,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 public class UserControllerTest {
     UserStorage userStorage;
     UserService userService;
     UserController userController;
+    User user;
 
     @BeforeEach
     void beforeEach() {
         userStorage = new InMemoryUserStorage();
-        userService = new UserService((InMemoryUserStorage) userStorage);
+        userService = new UserService(userStorage);
         userController = new UserController(userService);
-    }
 
-    @Test
-    void idShouldBe1() {
-        User user = User.builder()
+        user = User.builder()
                 .email("test@test.ru")
                 .login("login")
                 .birthday(LocalDate.of(2000, 12, 1))
                 .build();
         userController.create(user);
+    }
+
+    @Test
+    void idShouldBe1() {
         assertEquals(1, user.getId());
     }
 
     @Test
     void nameShouldBeAsLogin() {
-        User user = User.builder()
-                .email("test@test.ru")
-                .login("login")
-                .birthday(LocalDate.of(2000, 12, 1))
-                .build();
-        userController.create(user);
         assertEquals("login", user.getName());
     }
 
     @Test
     void shouldThrowNoSuchUserException() {
-
-        User user = User.builder()
-                .email("test@test.ru")
-                .login("login")
-                .birthday(LocalDate.of(2000, 12, 1))
-                .build();
-        userController.create(user);
-
         User updatedUser = User.builder()
                 .id(2)
                 .email("updated@test.ru")
@@ -78,3 +68,4 @@ public class UserControllerTest {
         assertEquals("Пользователь не найден", exception.getMessage());
     }
 }
+
