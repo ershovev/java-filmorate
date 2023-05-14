@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -12,15 +12,12 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
+@AllArgsConstructor
 @Component
 @Primary
 public class UserDbStorage implements UserStorage {
-    private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public List<User> findAll() {

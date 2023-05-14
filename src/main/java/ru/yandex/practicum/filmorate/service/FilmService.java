@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchFilmException;
 import ru.yandex.practicum.filmorate.exceptions.NoSuchUserException;
@@ -19,11 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FilmService {
     private static final LocalDate EARLIEST_POSSIBLE_FILM_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
-    @Autowired
     private final FilmStorage filmStorage;
-
-    @Autowired
     private final UserStorage userStorage;
 
     public List<Film> findAll() {
