@@ -1,5 +1,9 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Filmorate
+Cервис оценки фильмов с возможностью вывода ТОПа фильмов и дружбы
+пользователей
+
+Стек: REST-сервис с использованием Spring Boot, Maven, Lombok и взаимодействие с БД (H2) с
+помощью JDBC.
 
 DB scheme
 
